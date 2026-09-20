@@ -13,6 +13,22 @@ from .logging_utils import configure_logging
 from .train_model import train_model
 
 
+def positive_int(value: str) -> int:
+    """Parse a strictly positive integer for argparse options."""
+    parsed_value = int(value)
+    if parsed_value < 1:
+        raise argparse.ArgumentTypeError("value must be at least 1")
+    return parsed_value
+
+
+def minimum_two_int(value: str) -> int:
+    """Parse an integer suitable for cross-validation folds."""
+    parsed_value = int(value)
+    if parsed_value < 2:
+        raise argparse.ArgumentTypeError("value must be at least 2")
+    return parsed_value
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Sales prediction pipeline")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -21,8 +37,8 @@ def main() -> None:
     train_parser.add_argument("data_path")
     train_parser.add_argument("target_column")
     train_parser.add_argument("--model-path", default="models/sales_model.joblib")
-    train_parser.add_argument("--n-estimators", type=int, default=300)
-    train_parser.add_argument("--cv-folds", type=int, default=5)
+    train_parser.add_argument("--n-estimators", type=positive_int, default=300)
+    train_parser.add_argument("--cv-folds", type=minimum_two_int, default=5)
 
     predict_parser = subparsers.add_parser("predict", help="Predict sales from a CSV")
     predict_parser.add_argument("data_path")

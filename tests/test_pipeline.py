@@ -1,9 +1,11 @@
+import argparse
 import tempfile
 import unittest
 from pathlib import Path
 
 import pandas as pd
 
+from src.cli import minimum_two_int, positive_int
 from src.evaluation import evaluate_regression
 from src.predict import predict_sales
 from src.predict import load_model_artifact
@@ -11,6 +13,15 @@ from src.train_model import train_model
 
 
 class PipelineTests(unittest.TestCase):
+    def test_cli_parameter_parsers_reject_invalid_values(self):
+        self.assertEqual(positive_int("3"), 3)
+        self.assertEqual(minimum_two_int("2"), 2)
+
+        with self.assertRaises(argparse.ArgumentTypeError):
+            positive_int("0")
+        with self.assertRaises(argparse.ArgumentTypeError):
+            minimum_two_int("1")
+
     def test_evaluation_returns_named_regression_metrics(self):
         metrics = evaluate_regression(pd.Series([10, 20]), pd.Series([12, 18]))
 
